@@ -1,9 +1,11 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  AccessArt - single code-based API (one Lambda behind one catch-all HTTP API route)
-  plus DynamoDB tables. Everything gateway/table-shaped lives here, never console-only
-  (CLAUDE.md rule 3). First deploy covers the waitlist; auth/custom domains come later.
+  AccessArt - single code-based API (one Lambda behind one catch-all HTTP API route),
+  DynamoDB tables, and the api.accessart.net custom domain. Everything gateway/table/
+  domain-shaped lives here, never console-only (CLAUDE.md rule 3). HARD RULE: named
+  resources take the `aa` prefix (CLAUDE.md rule 0); the stack name `accessart` and its
+  auto-generated `accessart-*` IAM roles are the two documented exceptions.
 
 Globals:
   Function:
@@ -12,31 +14,31 @@ Globals:
     Timeout: 30
 
 Resources:
-  AccessartApiFunction:
+  AaApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: accessart-api
+      FunctionName: aa-api
       CodeUri: ../backend/functions/accessart-api/
       Handler: index.handler
       Description: AccessArt single code-based API - all routes dispatched in app.mjs
       Environment:
         Variables:
           STAGE: prod
-          WAITLIST_TABLE: !Ref WaitlistTable
+          WAITLIST_TABLE: !Ref AaWaitlistTable
       Policies:
         - DynamoDBCrudPolicy:
-            TableName: !Ref WaitlistTable
+            TableName: !Ref AaWaitlistTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref StagingWaitlistTable
+            TableName: !Ref AaStagingWaitlistTable
       Events:
         CatchAll:
           Type: HttpApi
           Properties:
-            ApiId: !Ref AccessartHttpApi
+            ApiId: !Ref AaHttpApi
             Path: /{proxy+}
             Method: ANY
 
-  AccessartHttpApi:
+  AaHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
       Description: AccessArt HTTP API - one catch-all route, code-routed in the Lambda
@@ -54,11 +56,11 @@ Resources:
           - DELETE
           - OPTIONS
 
-  WaitlistTable:
+  AaWaitlistTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: waitlist
+      TableName: aa_waitlist
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: email
@@ -67,11 +69,11 @@ Resources:
         - AttributeName: email
           KeyType: HASH
 
-  StagingWaitlistTable:
+  AaStagingWaitlistTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: staging_waitlist
+      TableName: aa_staging_waitlist
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: email
@@ -79,8 +81,47 @@ Resources:
       KeySchema:
         - AttributeName: email
           KeyType: HASH
+
+  AaApiCertificate:
+    Type: AWS::CertificateManager::Certificate
+    Properties:
+      DomainName: api.accessart.net
+      ValidationMethod: DNS
+      DomainValidationOptions:
+        - DomainName: api.accessart.net
+          HostedZoneId: Z1036031314RGU6VKSXZZ
+
+  AaApiDomain:
+    Type: AWS::ApiGatewayV2::DomainName
+    Properties:
+      DomainName: api.accessart.net
+      DomainNameConfigurations:
+        - CertificateArn: !Ref AaApiCertificate
+          EndpointType: REGIONAL
+          SecurityPolicy: TLS_1_2
+
+  AaApiMapping:
+    Type: AWS::ApiGatewayV2::ApiMapping
+    DependsOn: AaHttpApiApiGatewayDefaultStage
+    Properties:
+      ApiId: !Ref AaHttpApi
+      DomainName: !Ref AaApiDomain
+      Stage: $default
+
+  AaApiDnsRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: Z1036031314RGU6VKSXZZ
+      Name: api.accessart.net
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt AaApiDomain.RegionalDomainName
+        HostedZoneId: !GetAtt AaApiDomain.RegionalHostedZoneId
 
 Outputs:
   ApiUrl:
-    Description: Invoke URL for the AccessArt API (set this as VITE_API_BASE_URL until api.accessart.net exists)
-    Value: !Sub "https://${AccessartHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Description: Custom-domain base URL for the AccessArt API
+    Value: https://api.accessart.net
+  RawApiUrl:
+    Description: Raw execute-api URL (works before/without the custom domain)
+    Value: !Sub "https://${AaHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

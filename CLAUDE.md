@@ -14,6 +14,7 @@ buildguide/                        decisions, architecture, research — the spe
 
 ## Rules
 
+0. **HARD RULE — everything is prefixed `aa`.** Every named AWS resource belonging to this project takes the `aa` prefix: the Lambda is `aa-api`, tables are `aa_*` (`aa_waitlist`, `aa_staging_waitlist`), buckets/queues/log groups `aa-*`. The API's domain is `api.accessart.net`. Never create an unprefixed resource. Two documented exceptions only: the CloudFormation stack is named `accessart`, and its auto-generated IAM roles start `accessart-*` — because the `accessart-iam` deploy grant on the `claude-code` user is scoped to `role/accessart-*` (do not "fix" this without also changing that policy in the console).
 1. **Single code-based API.** Every route is dispatched in code in `backend/functions/accessart-api/app.mjs`. Adding a route NEVER means editing API Gateway — the gateway has one catch-all `ANY /{proxy+}` route defined in `infra/`. Public routes resolve above identity resolution; authed routes below.
 2. **API response shapes are immutable once shipped.** Envelopes: `{ ok, data }` for items, `{ ok, items, next_key }` for lists, `{ ok:false, error, message }` for errors. Frontends hand-mirror types; breaking a shape breaks three surfaces at once.
 3. **Everything deployed has source here.** A folder is a deployable Lambda only if it contains `config.json`. No console-only Lambdas, no console-only gateway routes (both happened in PlanEase; neither happens here).

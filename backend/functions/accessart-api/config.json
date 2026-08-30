@@ -1,5 +1,5 @@
 {
-  "function_name": "accessart-api",
+  "function_name": "aa-api",
   "runtime": "nodejs22.x",
   "memory_mb": 512,
   "timeout_seconds": 30,
@@ -7,11 +7,11 @@
   "env": {
     "prod": {
       "STAGE": "prod",
-      "WAITLIST_TABLE": "waitlist"
+      "WAITLIST_TABLE": "aa_waitlist"
     },
     "staging": {
       "STAGE": "staging",
-      "WAITLIST_TABLE": "staging_waitlist"
+      "WAITLIST_TABLE": "aa_staging_waitlist"
     }
   },
   "secrets_set_in_lambda_console_only": []
