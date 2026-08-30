@@ -131,28 +131,40 @@
   transform: translateY(-50%);
   z-index: 2;
   pointer-events: none;
+  transition: left 0.55s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+/* the see-saw: art hover sends the triangle right, walls sends it home */
+.half--art:hover ~ .seam-triangle {
+  left: calc(100% - 136px);
+}
+
+.half--walls:hover ~ .seam-triangle {
+  left: 64px;
 }
 
 /* first access — subtle right-edge tab + card */
 .fa-tab {
   position: fixed;
-  right: 14px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
   writing-mode: vertical-rl;
   font-family: var(--grot);
-  font-size: 12px;
-  letter-spacing: 0.24em;
-  color: var(--muted);
-  background: none;
-  border: none;
-  padding: 8px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.26em;
+  color: var(--red);
+  background: var(--paper);
+  border: 2px solid var(--red);
+  padding: 14px 7px;
   cursor: pointer;
   z-index: 15;
 }
 
 .fa-tab:hover {
-  color: var(--red);
+  background: var(--red);
+  color: var(--paper);
 }
 
 .fa-panel {
@@ -302,7 +314,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .half,
-  .half-deal {
+  .half-deal,
+  .seam-triangle {
     transition: none !important;
   }
 }
