@@ -16,7 +16,7 @@ export function welcomeEmail() {
 
   const text = `ohhh yeh. you're on the list.
 
-thanks for showing interest. you're on the first access list for accessart — one email when the doors open, and a head start through them.
+thanks for showing interest. you're on the first access list for accessart. one email when the doors open, and a head start through them.
 
 that's it. no spam, no newsletters, nothing weird.
 
@@ -48,7 +48,7 @@ accessart.net
       <div style="height:26px;"></div>
 
       <div style="font-family:${GROT};font-size:15px;line-height:1.65;color:${MUTED};">
-        thanks for showing interest. you&rsquo;re on the first access list for accessart &mdash; one email when the doors open, and a head start through them.
+        thanks for showing interest. you&rsquo;re on the first access list for accessart. one email when the doors open, and a head start through them.
         <br><br>
         that&rsquo;s it. no spam, no newsletters, nothing weird.
       </div>

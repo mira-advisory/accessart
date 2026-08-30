@@ -54,7 +54,7 @@ function FirstAccess({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
     const base = import.meta.env.VITE_API_BASE_URL as string | undefined
     if (!base) {
       setStatus('error')
-      setErr('backend isn’t wired up yet — the aws deploy is next.')
+      setErr('backend isn’t wired up yet. the aws deploy is next.')
       return
     }
     setStatus('sending')
@@ -92,12 +92,12 @@ function FirstAccess({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
           <div className="fa-label">first access.</div>
           {status === 'done' ? (
             <p className="fa-status fa-status--ok">
-              you’re in. one email when the doors open — that’s it.
+              you’re in. one email when the doors open. that’s it.
             </p>
           ) : (
             <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
               <p className="fa-copy">
-                brisbane, soon. leave an email — one message when the doors open, and a head start
+                brisbane, soon. leave an email. one message when the doors open, and a head start
                 through them.
               </p>
               <input
@@ -158,8 +158,8 @@ function App() {
           </span>
           <span className="half-deal">
             <span className="deal-label">the deal.</span>
-            free to list. you keep most of the money. your art hangs on real walls — cafés, homes,
-            trails — and we tell you where. not a gallery.
+            free to list. you keep most of the money. your art hangs on real walls: cafés, homes,
+            trails. we tell you where. not a gallery.
           </span>
         </a>
 
@@ -169,7 +169,7 @@ function App() {
           </span>
           <span className="half-deal">
             <span className="deal-label">the deal.</span>
-            home wall or café wall — same thing to us. local art on rotation: rent it from $[X] a
+            home wall or café wall, same thing to us. local art on rotation: rent it from $[X] a
             week, swap it when you’re over it, buy it if it sticks.
           </span>
         </a>

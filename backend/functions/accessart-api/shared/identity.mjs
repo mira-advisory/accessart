@@ -1,5 +1,5 @@
 // Identity: the JWT (verified by the gateway's Lambda authorizer) proves WHO;
-// the users table decides WHAT they may do — a roles set on one user record:
+// the users table decides WHAT they may do: a roles set on one user record:
 // buyer / artist / venue / operator (future: delivery_agent). CLAUDE.md rule 4.
 //
 // Placeholder until Cognito + the users table exist: reads the authorizer

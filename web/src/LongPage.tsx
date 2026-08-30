@@ -1,4 +1,4 @@
-// The original long-scroll landing, kept for reference — not routed.
+// The original long-scroll landing, kept for reference; not routed.
 // Its sections (marquee, café wall, quote, how-it-goes, panels, CTA) will feed
 // the pages behind the two doors.
 import { useState } from 'react'
@@ -7,7 +7,7 @@ import './App.css'
 type Door = 'want' | 'make' | 'walls'
 
 const deals: Record<Door, string> = {
-  want: 'original art, rented from $[X] a week. swap it at the café when you’re over it. buy it if it sticks — your rent counts toward the price.',
+  want: 'original art, rented from $[X] a week. swap it at the café when you’re over it. buy it if it sticks. your rent counts toward the price.',
   make: 'free to list. you keep most of the money. your art hangs in real cafés and we tell you where. no vetting, no politics. not a gallery.',
   walls: 'free local art on rotation for your venue. we handle the swaps. you take a cut when a piece sells off your wall. people come in to look, stay to spend.',
 }
@@ -31,10 +31,10 @@ function Arrow() {
 const marqueeChunk = (
   <>
     <span className="marquee-chunk">
-      rent it — swap it — <em>buy it if you can’t let go</em> — not a gallery —{' '}
+      rent it. swap it. <em>buy it if you can’t let go.</em> not a gallery.{' '}
     </span>
     <span className="marquee-chunk">
-      rent it — swap it — <em>buy it if you can’t let go</em> — not a gallery —{' '}
+      rent it. swap it. <em>buy it if you can’t let go.</em> not a gallery.{' '}
     </span>
   </>
 )
@@ -191,9 +191,9 @@ function LongPage() {
               </>
             ) : (
               <>
-                accessart is where emerging artists get seen — on café walls, on art trails, on your
-                feed — and where their art gets rented, swapped, and occasionally bought. brisbane
-                first. everywhere eventually.
+                accessart is where emerging artists get seen: café walls, art trails, your feed.
+                their art gets rented, swapped, and occasionally bought. brisbane first. everywhere
+                eventually.
               </>
             )}
           </p>
@@ -246,7 +246,7 @@ function LongPage() {
           </span>
         </p>
         <p className="quote-sub">you’ll get to see yours hanging in a café first.</p>
-        <p className="quote-src">— art basel &amp; ubs art market report, 2026</p>
+        <p className="quote-src">art basel &amp; ubs art market report, 2026</p>
       </section>
 
       <section className="how">
@@ -267,7 +267,7 @@ function LongPage() {
           <div className="panel-eyebrow">for artists</div>
           <h3>your art belongs on walls, not in your spare room.</h3>
           <p>
-            free to list. you keep most of the money. your page is yours — your story, your prices,
+            free to list. you keep most of the money. your page is yours: your story, your prices,
             your people. and when your piece is hanging in a café across town, we’ll tell you. it’s a
             good feeling.
           </p>

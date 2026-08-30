@@ -10,7 +10,7 @@ export function getMethod(event) {
 }
 
 // HTTP API v2 prefixes rawPath with the stage name on non-$default stages
-// (e.g. /staging/health) — strip it so routing sees the same path in every env.
+// (e.g. /staging/health); strip it so routing sees the same path in every env.
 export function getPath(event) {
   let path = event?.rawPath ?? event?.path ?? "/";
   const stage = event?.requestContext?.stage;

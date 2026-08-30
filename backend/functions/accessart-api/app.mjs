@@ -1,4 +1,4 @@
-// The single code-based API. Every route is dispatched here, in code —
+// The single code-based API. Every route is dispatched here, in code:
 // adding a route NEVER means editing API Gateway (CLAUDE.md rule 1).
 // Public routes resolve ABOVE the identity gate; authed routes below it.
 import { jsonResponse, getMethod, getPath, parseBody } from "./shared/http.mjs";
