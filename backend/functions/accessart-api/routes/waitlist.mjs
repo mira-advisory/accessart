@@ -1,15 +1,7 @@
 import { jsonResponse } from "../shared/http.mjs";
 import { addToWaitlist } from "../stores/waitlist.mjs";
 import { sendEmail } from "../shared/email.mjs";
-
-const WELCOME_TEXT = `thanks for showing interest.
-
-you're on the first access list for accessart — one email when the doors open, and a head start through them. that's it. no spam, no newsletters, nothing weird.
-
-— accessart
-rent it. swap it. buy it if it sticks.
-accessart.net
-`;
+import { welcomeEmail } from "../shared/templates.mjs";
 
 export async function post(ctx) {
   const email = String(ctx.body?.email ?? "").trim().toLowerCase();
@@ -27,11 +19,13 @@ export async function post(ctx) {
   await addToWaitlist({ email, doors, source: "landing" });
 
   // Emails are best-effort: a signup must never fail because SES hiccuped.
+  const welcome = welcomeEmail();
   const results = await Promise.allSettled([
     sendEmail({
       to: email,
-      subject: "ohhh yeh. you're on the list.",
-      text: WELCOME_TEXT,
+      subject: welcome.subject,
+      text: welcome.text,
+      html: welcome.html,
     }),
     process.env.NOTIFY_EMAIL
       ? sendEmail({

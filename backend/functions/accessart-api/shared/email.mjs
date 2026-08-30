@@ -3,7 +3,9 @@ import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 const ses = new SESv2Client({});
 const FROM = process.env.FROM_EMAIL;
 
-export async function sendEmail({ to, subject, text }) {
+export async function sendEmail({ to, subject, text, html }) {
+  const body = { Text: { Data: text } };
+  if (html) body.Html = { Data: html };
   await ses.send(
     new SendEmailCommand({
       FromEmailAddress: FROM,
@@ -11,7 +13,7 @@ export async function sendEmail({ to, subject, text }) {
       Content: {
         Simple: {
           Subject: { Data: subject },
-          Body: { Text: { Data: text } },
+          Body: body,
         },
       },
     })
