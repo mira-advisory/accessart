@@ -133,7 +133,7 @@
   pointer-events: none;
   color: #141310;
   /* no `left` here: the glide only plays on the way out — the return is instant, no bounce */
-  transition: opacity 0.3s ease, color 0.35s ease;
+  transition: opacity 0.3s ease;
 }
 
 /* while first access is open, the triangle steps aside entirely */
@@ -144,12 +144,13 @@
 /* art hover: glide right, clear of the deal text */
 .half--art:hover ~ .seam-triangle {
   left: calc(100% - 136px);
-  transition: left 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease, color 0.35s ease;
+  transition: left 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
 }
 
-/* walls hover: no travel — it just goes a little white */
+/* walls hover: the same glide, back the other way */
 .half--walls:hover ~ .seam-triangle {
-  color: rgba(233, 228, 216, 0.85);
+  left: 64px;
+  transition: left 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
 }
 
 /* first access — subtle right-edge tab + card */
