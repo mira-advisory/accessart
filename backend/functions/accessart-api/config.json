@@ -7,11 +7,15 @@
   "env": {
     "prod": {
       "STAGE": "prod",
-      "WAITLIST_TABLE": "aa_waitlist"
+      "WAITLIST_TABLE": "aa_waitlist",
+      "FROM_EMAIL": "accessart <hello@accessart.net>",
+      "NOTIFY_EMAIL": "ben.john.dawes@gmail.com"
     },
     "staging": {
       "STAGE": "staging",
-      "WAITLIST_TABLE": "aa_staging_waitlist"
+      "WAITLIST_TABLE": "aa_staging_waitlist",
+      "FROM_EMAIL": "accessart <hello@accessart.net>",
+      "NOTIFY_EMAIL": "ben.john.dawes@gmail.com"
     }
   },
   "secrets_set_in_lambda_console_only": []

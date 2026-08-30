@@ -25,11 +25,19 @@ Resources:
         Variables:
           STAGE: prod
           WAITLIST_TABLE: !Ref AaWaitlistTable
+          FROM_EMAIL: accessart <hello@accessart.net>
+          NOTIFY_EMAIL: ben.john.dawes@gmail.com
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref AaWaitlistTable
         - DynamoDBCrudPolicy:
             TableName: !Ref AaStagingWaitlistTable
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+              Resource:
+                - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/accessart.net"
       Events:
         CatchAll:
           Type: HttpApi
