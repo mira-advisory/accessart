@@ -131,7 +131,12 @@
   transform: translateY(-50%);
   z-index: 2;
   pointer-events: none;
-  transition: left 0.55s cubic-bezier(0.7, 0, 0.3, 1);
+  transition: left 0.9s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+
+/* while first access is open, the triangle steps aside entirely */
+.landing--fa .seam-triangle {
+  opacity: 0;
 }
 
 /* the see-saw: art hover sends the triangle right, walls sends it home */

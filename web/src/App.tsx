@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
 import './App.css'
 
@@ -19,13 +19,29 @@ function Triangle({ size = 18, fill = 'currentColor' }: { size?: number; fill?: 
 
 type FaStatus = 'idle' | 'sending' | 'done' | 'error'
 
-function FirstAccess() {
-  const [open, setOpen] = useState(false)
+function FirstAccess({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
+  const zoneRef = useRef<HTMLSpanElement>(null)
   const [email, setEmail] = useState('')
   const [hasArt, setHasArt] = useState(false)
   const [hasWalls, setHasWalls] = useState(false)
   const [status, setStatus] = useState<FaStatus>('idle')
   const [err, setErr] = useState('')
+
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (e: PointerEvent) => {
+      if (zoneRef.current && !zoneRef.current.contains(e.target as Node)) setOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open, setOpen])
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -58,8 +74,13 @@ function FirstAccess() {
   }
 
   return (
-    <>
-      <button className="fa-tab" type="button" onClick={() => setOpen((o) => !o)}>
+    <span ref={zoneRef}>
+      <button
+        className="fa-tab"
+        type="button"
+        onClick={() => setOpen(!open)}
+        onMouseEnter={() => setOpen(true)}
+      >
         first access
       </button>
 
@@ -111,13 +132,15 @@ function FirstAccess() {
           )}
         </div>
       ) : null}
-    </>
+    </span>
   )
 }
 
 function App() {
+  const [faOpen, setFaOpen] = useState(false)
+
   return (
-    <div className="landing">
+    <div className={`landing${faOpen ? ' landing--fa' : ''}`}>
       <div className="noise" aria-hidden="true"></div>
 
       <header className="landing-nav">
@@ -156,7 +179,7 @@ function App() {
         </div>
       </main>
 
-      <FirstAccess />
+      <FirstAccess open={faOpen} setOpen={setFaOpen} />
 
       <footer className="landing-foot">
         <span>rent it. swap it. buy it if it sticks.</span>
