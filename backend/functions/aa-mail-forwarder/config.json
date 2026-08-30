@@ -1,0 +1,16 @@
+{
+  "function_name": "aa-mail-forwarder",
+  "runtime": "nodejs22.x",
+  "memory_mb": 256,
+  "timeout_seconds": 30,
+  "description": "Forwards inbound @accessart.net mail (SES receipt rule -> S3) to Ben's inbox",
+  "env": {
+    "prod": {
+      "MAIL_BUCKET": "aa-mail-400792111355",
+      "MAIL_PREFIX": "inbound/",
+      "FORWARD_TO": "ben.john.dawes@gmail.com",
+      "FROM_EMAIL": "hello@accessart.net"
+    }
+  },
+  "secrets_set_in_lambda_console_only": []
+}

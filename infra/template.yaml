@@ -126,6 +126,104 @@ Resources:
         DNSName: !GetAtt AaApiDomain.RegionalDomainName
         HostedZoneId: !GetAtt AaApiDomain.RegionalHostedZoneId
 
+  AaMailBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: aa-mail-400792111355
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire-inbound
+            Status: Enabled
+            Prefix: inbound/
+            ExpirationInDays: 90
+
+  AaMailBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AaMailBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ses.amazonaws.com
+            Action: s3:PutObject
+            Resource: !Sub "${AaMailBucket.Arn}/*"
+            Condition:
+              StringEquals:
+                aws:SourceAccount: !Ref AWS::AccountId
+
+  AaMailForwarderFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: aa-mail-forwarder
+      CodeUri: ../backend/functions/aa-mail-forwarder/
+      Handler: index.handler
+      MemorySize: 256
+      Description: Forwards inbound @accessart.net mail to Ben's inbox
+      Environment:
+        Variables:
+          MAIL_BUCKET: !Ref AaMailBucket
+          MAIL_PREFIX: inbound/
+          FORWARD_TO: ben.john.dawes@gmail.com
+          FROM_EMAIL: hello@accessart.net
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref AaMailBucket
+        - Statement:
+            - Effect: Allow
+              Action:
+                - ses:SendEmail
+                - ses:SendRawEmail
+              Resource:
+                - !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/accessart.net"
+
+  AaMailForwarderInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref AaMailForwarderFunction
+      Action: lambda:InvokeFunction
+      Principal: ses.amazonaws.com
+      SourceAccount: !Ref AWS::AccountId
+
+  AaMailRuleSet:
+    Type: AWS::SES::ReceiptRuleSet
+    Properties:
+      RuleSetName: aa-mail
+
+  AaMailRule:
+    Type: AWS::SES::ReceiptRule
+    DependsOn:
+      - AaMailBucketPolicy
+      - AaMailForwarderInvokePermission
+    Properties:
+      RuleSetName: !Ref AaMailRuleSet
+      Rule:
+        Name: forward-to-ben
+        Enabled: true
+        ScanEnabled: true
+        Recipients:
+          - ben@accessart.net
+          - hello@accessart.net
+        Actions:
+          - S3Action:
+              BucketName: !Ref AaMailBucket
+              ObjectKeyPrefix: inbound/
+          - LambdaAction:
+              FunctionArn: !GetAtt AaMailForwarderFunction.Arn
+              InvocationType: Event
+
+  AaMxRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: Z1036031314RGU6VKSXZZ
+      Name: accessart.net
+      Type: MX
+      TTL: 300
+      ResourceRecords:
+        - "10 inbound-smtp.ap-southeast-2.amazonaws.com"
+
 Outputs:
   ApiUrl:
     Description: Custom-domain base URL for the AccessArt API
