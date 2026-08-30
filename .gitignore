@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env.local
+.env.*.local
+infra/packaged.yaml
+.DS_Store
+Thumbs.db

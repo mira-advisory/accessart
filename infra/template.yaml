@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  AccessArt - single code-based API (one Lambda behind one catch-all HTTP API route)
+  plus DynamoDB tables. Everything gateway/table-shaped lives here, never console-only
+  (CLAUDE.md rule 3). First deploy covers the waitlist; auth/custom domains come later.
+
+Globals:
+  Function:
+    Runtime: nodejs22.x
+    MemorySize: 512
+    Timeout: 30
+
+Resources:
+  AccessartApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: accessart-api
+      CodeUri: ../backend/functions/accessart-api/
+      Handler: index.handler
+      Description: AccessArt single code-based API - all routes dispatched in app.mjs
+      Environment:
+        Variables:
+          STAGE: prod
+          WAITLIST_TABLE: !Ref WaitlistTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WaitlistTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref StagingWaitlistTable
+      Events:
+        CatchAll:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref AccessartHttpApi
+            Path: /{proxy+}
+            Method: ANY
+
+  AccessartHttpApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      Description: AccessArt HTTP API - one catch-all route, code-routed in the Lambda
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowHeaders:
+          - authorization
+          - content-type
+        AllowMethods:
+          - GET
+          - POST
+          - PATCH
+          - PUT
+          - DELETE
+          - OPTIONS
+
+  WaitlistTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: waitlist
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+
+  StagingWaitlistTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: staging_waitlist
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: email
+          KeyType: HASH
+
+Outputs:
+  ApiUrl:
+    Description: Invoke URL for the AccessArt API (set this as VITE_API_BASE_URL until api.accessart.net exists)
+    Value: !Sub "https://${AccessartHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

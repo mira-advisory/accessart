@@ -1,0 +1,18 @@
+{
+  "function_name": "accessart-api",
+  "runtime": "nodejs22.x",
+  "memory_mb": 512,
+  "timeout_seconds": 30,
+  "description": "AccessArt single code-based API - all routes dispatched in app.mjs",
+  "env": {
+    "prod": {
+      "STAGE": "prod",
+      "WAITLIST_TABLE": "waitlist"
+    },
+    "staging": {
+      "STAGE": "staging",
+      "WAITLIST_TABLE": "staging_waitlist"
+    }
+  },
+  "secrets_set_in_lambda_console_only": []
+}

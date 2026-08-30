@@ -1,0 +1,13 @@
+{
+  "name": "accessart",
+  "private": true,
+  "version": "0.0.0",
+  "description": "AccessArt - root convenience scripts; the web app lives in web/, mobile in mobile/, API in backend/",
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "typecheck": "npx --prefix web tsc -b web",
+    "install:web": "npm --prefix web install",
+    "install:mobile": "npm --prefix mobile install"
+  }
+}
