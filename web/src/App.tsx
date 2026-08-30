@@ -175,7 +175,7 @@ function App() {
         </a>
 
         <div className="seam-triangle" aria-hidden="true">
-          <Triangle size={72} fill="#141310" />
+          <Triangle size={72} fill="currentColor" />
         </div>
       </main>
 
