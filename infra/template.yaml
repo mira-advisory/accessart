@@ -1,11 +1,23 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  AccessArt - single code-based API (one Lambda behind one catch-all HTTP API route),
-  DynamoDB tables, and the api.accessart.net custom domain. Everything gateway/table/
-  domain-shaped lives here, never console-only (CLAUDE.md rule 3). HARD RULE: named
-  resources take the `aa` prefix (CLAUDE.md rule 0); the stack name `accessart` and its
-  auto-generated `accessart-*` IAM roles are the two documented exceptions.
+  AccessArt stage-aware stack: single code-based API (one Lambda behind one catch-all
+  HTTP API route), DynamoDB tables, Cognito, custom domain. Deployed twice: stack
+  "accessart" with Stage=prod and stack "accessart-dev" with Stage=dev. Mail receiving
+  and the apex MX are prod-only. Everything lives here, never console-only (CLAUDE.md
+  rule 3). Named resources take the aa prefix (rule 0); the stack names and their
+  auto-generated accessart-* IAM roles are the documented exceptions.
+
+Parameters:
+  Stage:
+    Type: String
+    AllowedValues:
+      - prod
+      - dev
+    Default: prod
+
+Conditions:
+  IsProd: !Equals [!Ref Stage, prod]
 
 Globals:
   Function:
@@ -17,13 +29,13 @@ Resources:
   AaApiFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: aa-api
+      FunctionName: !If [IsProd, aa-api, aa-api-dev]
       CodeUri: ../backend/functions/accessart-api/
       Handler: index.handler
       Description: AccessArt single code-based API - all routes dispatched in app.mjs
       Environment:
         Variables:
-          STAGE: prod
+          STAGE: !Ref Stage
           WAITLIST_TABLE: !Ref AaWaitlistTable
           USERS_TABLE: !Ref AaUsersTable
           MARKETS_TABLE: !Ref AaMarketsTable
@@ -35,11 +47,7 @@ Resources:
         - DynamoDBCrudPolicy:
             TableName: !Ref AaWaitlistTable
         - DynamoDBCrudPolicy:
-            TableName: !Ref AaStagingWaitlistTable
-        - DynamoDBCrudPolicy:
             TableName: !Ref AaUsersTable
-        - DynamoDBCrudPolicy:
-            TableName: !Ref AaStagingUsersTable
         - DynamoDBCrudPolicy:
             TableName: !Ref AaMarketsTable
         - Statement:
@@ -59,7 +67,7 @@ Resources:
   AaHttpApi:
     Type: AWS::Serverless::HttpApi
     Properties:
-      Description: AccessArt HTTP API - one catch-all route, code-routed in the Lambda
+      Description: !Sub "AccessArt HTTP API (${Stage}) - one catch-all route, code-routed in the Lambda"
       CorsConfiguration:
         AllowOrigins:
           - "*"
@@ -78,7 +86,7 @@ Resources:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: aa_waitlist
+      TableName: !If [IsProd, aa_waitlist, aa_dev_waitlist]
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: email
@@ -87,17 +95,39 @@ Resources:
         - AttributeName: email
           KeyType: HASH
 
-  AaStagingWaitlistTable:
+  AaUsersTable:
     Type: AWS::DynamoDB::Table
     DeletionPolicy: Retain
     Properties:
-      TableName: aa_staging_waitlist
+      TableName: !If [IsProd, aa_users, aa_dev_users]
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
-        - AttributeName: email
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: handle
           AttributeType: S
       KeySchema:
-        - AttributeName: email
+        - AttributeName: user_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: HandleIndex
+          KeySchema:
+            - AttributeName: handle
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  AaMarketsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !If [IsProd, aa_markets, aa_dev_markets]
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: market_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: market_id
           KeyType: HASH
 
   AaUserPool:
@@ -105,7 +135,7 @@ Resources:
     DeletionPolicy: Retain
     UpdateReplacePolicy: Retain
     Properties:
-      UserPoolName: aa-users
+      UserPoolName: !If [IsProd, aa-users, aa-users-dev]
       UserPoolTier: ESSENTIALS
       DeletionProtection: ACTIVE
       UsernameAttributes:
@@ -130,7 +160,7 @@ Resources:
   AaUserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: aa-web
+      ClientName: !If [IsProd, aa-web, aa-web-dev]
       UserPoolId: !Ref AaUserPool
       GenerateSecret: false
       PreventUserExistenceErrors: ENABLED
@@ -146,76 +176,19 @@ Resources:
         IdToken: hours
         RefreshToken: days
 
-  AaUsersTable:
-    Type: AWS::DynamoDB::Table
-    DeletionPolicy: Retain
-    Properties:
-      TableName: aa_users
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: user_id
-          AttributeType: S
-        - AttributeName: handle
-          AttributeType: S
-      KeySchema:
-        - AttributeName: user_id
-          KeyType: HASH
-      GlobalSecondaryIndexes:
-        - IndexName: HandleIndex
-          KeySchema:
-            - AttributeName: handle
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-
-  AaStagingUsersTable:
-    Type: AWS::DynamoDB::Table
-    DeletionPolicy: Retain
-    Properties:
-      TableName: aa_staging_users
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: user_id
-          AttributeType: S
-        - AttributeName: handle
-          AttributeType: S
-      KeySchema:
-        - AttributeName: user_id
-          KeyType: HASH
-      GlobalSecondaryIndexes:
-        - IndexName: HandleIndex
-          KeySchema:
-            - AttributeName: handle
-              KeyType: HASH
-          Projection:
-            ProjectionType: ALL
-
-  AaMarketsTable:
-    Type: AWS::DynamoDB::Table
-    DeletionPolicy: Retain
-    Properties:
-      TableName: aa_markets
-      BillingMode: PAY_PER_REQUEST
-      AttributeDefinitions:
-        - AttributeName: market_id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: market_id
-          KeyType: HASH
-
   AaApiCertificate:
     Type: AWS::CertificateManager::Certificate
     Properties:
-      DomainName: api.accessart.net
+      DomainName: !If [IsProd, api.accessart.net, dev-api.accessart.net]
       ValidationMethod: DNS
       DomainValidationOptions:
-        - DomainName: api.accessart.net
+        - DomainName: !If [IsProd, api.accessart.net, dev-api.accessart.net]
           HostedZoneId: Z1036031314RGU6VKSXZZ
 
   AaApiDomain:
     Type: AWS::ApiGatewayV2::DomainName
     Properties:
-      DomainName: api.accessart.net
+      DomainName: !If [IsProd, api.accessart.net, dev-api.accessart.net]
       DomainNameConfigurations:
         - CertificateArn: !Ref AaApiCertificate
           EndpointType: REGIONAL
@@ -233,7 +206,7 @@ Resources:
     Type: AWS::Route53::RecordSet
     Properties:
       HostedZoneId: Z1036031314RGU6VKSXZZ
-      Name: api.accessart.net
+      Name: !If [IsProd, api.accessart.net, dev-api.accessart.net]
       Type: A
       AliasTarget:
         DNSName: !GetAtt AaApiDomain.RegionalDomainName
@@ -241,6 +214,7 @@ Resources:
 
   AaMailBucket:
     Type: AWS::S3::Bucket
+    Condition: IsProd
     DeletionPolicy: Retain
     Properties:
       BucketName: aa-mail-400792111355
@@ -253,6 +227,7 @@ Resources:
 
   AaMailBucketPolicy:
     Type: AWS::S3::BucketPolicy
+    Condition: IsProd
     Properties:
       Bucket: !Ref AaMailBucket
       PolicyDocument:
@@ -269,6 +244,7 @@ Resources:
 
   AaMailForwarderFunction:
     Type: AWS::Serverless::Function
+    Condition: IsProd
     Properties:
       FunctionName: aa-mail-forwarder
       CodeUri: ../backend/functions/aa-mail-forwarder/
@@ -294,6 +270,7 @@ Resources:
 
   AaMailForwarderInvokePermission:
     Type: AWS::Lambda::Permission
+    Condition: IsProd
     Properties:
       FunctionName: !Ref AaMailForwarderFunction
       Action: lambda:InvokeFunction
@@ -302,11 +279,13 @@ Resources:
 
   AaMailRuleSet:
     Type: AWS::SES::ReceiptRuleSet
+    Condition: IsProd
     Properties:
       RuleSetName: aa-mail
 
   AaMailRule:
     Type: AWS::SES::ReceiptRule
+    Condition: IsProd
     DependsOn:
       - AaMailBucketPolicy
       - AaMailForwarderInvokePermission
@@ -329,6 +308,7 @@ Resources:
 
   AaMxRecord:
     Type: AWS::Route53::RecordSet
+    Condition: IsProd
     Properties:
       HostedZoneId: Z1036031314RGU6VKSXZZ
       Name: accessart.net
@@ -339,8 +319,8 @@ Resources:
 
 Outputs:
   ApiUrl:
-    Description: Custom-domain base URL for the AccessArt API
-    Value: https://api.accessart.net
+    Description: Custom-domain base URL for this stage's API
+    Value: !If [IsProd, "https://api.accessart.net", "https://dev-api.accessart.net"]
   RawApiUrl:
     Description: Raw execute-api URL (works before/without the custom domain)
     Value: !Sub "https://${AaHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

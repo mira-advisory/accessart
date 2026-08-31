@@ -148,6 +148,7 @@ function App() {
           <Triangle size={20} />
           <span>art</span>
         </a>
+        <a className="btn" href="/join">access</a>
       </header>
 
       <main className="split">
