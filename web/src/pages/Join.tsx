@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   autoSignIn,
   confirmSignIn,
@@ -46,6 +46,7 @@ function dryAuthError(e: unknown, fallback: string): string {
 
 function Join() {
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const door = params.get('door') === 'art' ? 'art' : 'walls'
 
   const [step, setStep] = useState<Step>('email')
@@ -213,6 +214,11 @@ function Join() {
       const roles = [...(hasArt ? ['artist'] : []), ...(hasWalls ? ['buyer'] : [])]
       const trimmedName = name.trim()
       await api.patchMe({ handle: h, ...(trimmedName ? { name: trimmedName } : {}), roles })
+      // Artists go straight to work; walls users get the done screen until the feed exists.
+      if (hasArt) {
+        navigate('/upload')
+        return
+      }
       setStep('done')
     } catch (error) {
       if (error instanceof ApiError && error.code === 'HANDLE_TAKEN') {
