@@ -65,6 +65,21 @@ Follow the **PlanEase pattern** (see `planease` / `planease-crm` repos), with de
 6. **New pieces with no PlanEase precedent:** Stripe (consumer payments + **Stripe Connect payouts to artists and venues**) — shapes the ledger/data model early; QR codes per artwork/venue wall; geo/map features for trails.
 7. **Logistics is deliberately deferred, and Ben is not the courier (Ben, 2026-08-30).** Logistics is acknowledged as massive but handled operationally over time — don't build it into v1. **Deliveries are done by third-party delivery agents** (gig platforms, courier partners, owner-drivers — eventually possibly an in-app `delivery_agent` role, making agents a fifth marketplace side), never by Ben and not by employees. The software models delivery as **status/custody fields** on a rental or swap (who holds the artwork, where it moves next, hand-over confirmed, proof-of-delivery photos) so any agent arrangement plugs in. No carrier integrations or rate engines until the operating model settles. References: `research/06-delivery-and-swap-logistics.md` (costs/packaging/insurance) and `research/08-delivery-agents.md` (who does the moving, agent onboarding, gig-platform law). **Not Uber** (Ben, 2026-08-30 — and research confirms Uber prohibits fragile items with a $100 value cap). Stage 1 agents: Airtasker / owner-driver vans (Little Green Truck, Handy Truck) / SEQ art-handler panel; batched trail-run vans at scale; legal advice required before any in-app `delivery_agent` job feed (gig-platform minimum-standards law commenced Aug 2026).
 
+## The money loop (phase 1, settled 2026-08-31)
+
+**Phase 1 scope: artists and people with walls.** Cafés, venues and trails are phase 2; nothing venue-shaped blocks the phase 1 build.
+
+Numbers carried from Ben's ArtX financial model (the Excel in the OneDrive ArtX folder), adjusted by `research/10-finance-payments.md`:
+
+- **Rent: 5% of artwork value per month.** Displayed as $/week (a $500 piece reads "$6/wk"), billed in 4-week blocks via Stripe Billing (weekly card charges lose ~5% to fixed fees; blocks also give clean swap boundaries).
+- **Splits:** artist 50% of rent. Direct sales: 15% commission (artist keeps 85%). Rent-to-buy sales: 40% commission, which funds the credit; artist still nets roughly 75% of value all-in on a converted sale. The 40% must be stated plainly in artist terms so it never reads as a gotcha (open: Ben to confirm final wording).
+- **Credit, option B (Ben):** rent counts 100% toward buying the piece currently on your wall, capped at 50% of its price. On swap, accrued credit converts at 50% into a portable **art fund**, spendable on any future purchase, same 50% cap at application, 24-month shelf life. Framed as a conditional discount, never stored value (keeps us outside escrow regulation; one legal sign-off required before launch).
+- **Swap:** free, included; rate changes to the new piece's rate at the next 4-week block.
+- **Risk:** no bonds (they kill "feels like they aren't paying"). Damage waiver funded from the platform's rent share, condition photos at every custody hand-over, brokered fine-art cover behind it.
+- **Floors:** min artwork value $100, min rentable piece $250 (research argued $500; holding at $250 for phase 1 home-wall logistics and watching the unit economics).
+- **Working assumption:** ~33% of rentals convert to sales (Ben's model).
+- **Artist onboarding must capture an ABN or a signed Statement by a supplier** (hobbyist form), or 47% withholding applies. Rental earnings are reportable under the sharing economy reporting regime (lodgments Jan 31 / Jul 31); sales are not.
+
 ## Platforms & mobile (Ben, 2026-08-30)
 
 Native iPhone **and** Android apps plus web — artist "easy upload" demands native camera/roll access.
