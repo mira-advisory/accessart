@@ -1,0 +1,132 @@
+.space {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.space-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.space-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.space-out {
+  font-family: var(--grot);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.space-out:hover {
+  color: var(--red);
+}
+
+.space-main {
+  flex: 1;
+  padding: 72px 48px;
+  max-width: 1100px;
+
+  @media (max-width: 760px) {
+    padding: 40px 20px;
+  }
+}
+
+.space-hello {
+  margin: 0;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.space-ohh {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(26px, 3.6vw, 48px);
+}
+
+.space-shout {
+  font-family: var(--anton);
+  font-size: clamp(44px, 7vw, 96px);
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+.space-sub {
+  margin: 18px 0 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+.space-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 28px;
+  margin-top: 48px;
+}
+
+.space-card {
+  border: 2px solid var(--ink);
+  background: var(--paper);
+  box-shadow: 8px 8px 0 var(--ink);
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--ink);
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.space-card:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.space-card--soon {
+  opacity: 0.45;
+  box-shadow: none;
+  cursor: default;
+}
+
+.space-card--soon:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.space-card-word {
+  font-family: var(--anton);
+  font-size: 28px;
+  text-transform: uppercase;
+}
+
+.space-card-copy {
+  font-size: 14px;
+  color: inherit;
+  opacity: 0.75;
+}
+
+.space-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 40px;
+  border-top: 2px solid var(--ink);
+  font-size: 13px;
+  color: var(--muted);
+}

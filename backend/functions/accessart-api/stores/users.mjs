@@ -3,6 +3,7 @@ import {
   DynamoDBDocumentClient,
   GetCommand,
   PutCommand,
+  QueryCommand,
   UpdateCommand,
   DeleteCommand,
 } from "@aws-sdk/lib-dynamodb";
@@ -19,6 +20,22 @@ const UPDATABLE_FIELDS = ["handle", "name", "roles"];
 export async function getUser(userId) {
   const res = await ddb.send(new GetCommand({ TableName: TABLE, Key: { user_id: userId } }));
   return res.Item ?? null;
+}
+
+// Handle reservation rows carry no handle attribute, so they never appear
+// in this GSI; only real user rows do.
+export async function getUserByHandle(handle) {
+  const res = await ddb.send(
+    new QueryCommand({
+      TableName: TABLE,
+      IndexName: "HandleIndex",
+      KeyConditionExpression: "#h = :h",
+      ExpressionAttributeNames: { "#h": "handle" },
+      ExpressionAttributeValues: { ":h": handle },
+      Limit: 1,
+    })
+  );
+  return res.Items?.[0] ?? null;
 }
 
 export async function createUser({ user_id, email }) {

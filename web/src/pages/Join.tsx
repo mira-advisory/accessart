@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
   autoSignIn,
   confirmSignIn,
@@ -11,6 +11,7 @@ import {
 } from 'aws-amplify/auth'
 import { api, ApiError } from '../api/client'
 import { authConfigured } from '../auth'
+import { goToSpace } from '../lib/host'
 import './Join.css'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -46,6 +47,7 @@ function dryAuthError(e: unknown, fallback: string): string {
 
 function Join() {
   const [params] = useSearchParams()
+  const navigate = useNavigate()
   const door = params.get('door') === 'art' ? 'art' : 'walls'
 
   const [step, setStep] = useState<Step>('email')
@@ -213,7 +215,13 @@ function Join() {
       const roles = [...(hasArt ? ['artist'] : []), ...(hasWalls ? ['buyer'] : [])]
       const trimmedName = name.trim()
       await api.patchMe({ handle: h, ...(trimmedName ? { name: trimmedName } : {}), roles })
-      setStep('done')
+      // Artists go straight to work; everyone else lands in their space.
+      if (hasArt) {
+        navigate('/upload')
+        return
+      }
+      goToSpace(navigate)
+      return
     } catch (error) {
       if (error instanceof ApiError && error.code === 'HANDLE_TAKEN') {
         setErr('that handle’s taken.')
@@ -389,9 +397,13 @@ function Join() {
                 <span className="join-ohh">ohhh yeh.</span>{' '}
                 <span className="join-shout">you’re in.</span>
               </h1>
-              <p className="join-next">
-                {hasArt ? 'next: your first upload. soon.' : 'next: the feed. soon.'}
-              </p>
+              {hasArt ? (
+                <Link className="btn join-btn" to="/upload">
+                  go upload.
+                </Link>
+              ) : (
+                <p className="join-next">next: the feed. soon.</p>
+              )}
               <Link className="join-back" to="/">
                 back to the front.
               </Link>

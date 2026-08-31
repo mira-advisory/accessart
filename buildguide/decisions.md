@@ -46,7 +46,7 @@ Last updated: 2026-08-30.
 | Subdomain | Role |
 |---|---|
 | `accessart.net` | public marketing + marketplace browse |
-| `app.accessart.net` | logged-in app (all sides, incl. admin module) |
+| `space.accessart.net` | **the space**: the logged-in home (Ben, 2026-08-31; renamed from the planned app. subdomain). On dev and localhost the space is the /space path on the same host. Login always lands in the space (artists land in /upload). The landing recognises a session: the access button becomes "your space". |
 | `api.accessart.net` / `staging-api.accessart.net` | the single API |
 | `auth.accessart.net` | Cognito hosted UI |
 

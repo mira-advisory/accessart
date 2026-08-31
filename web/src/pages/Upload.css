@@ -1,0 +1,406 @@
+/* ================= upload flow (/upload) ================= */
+/* local classes only. shared tokens and .btn live in index.css / App.css. */
+
+.up {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.up-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.up-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* single column, phone first */
+.up-main {
+  flex: 1;
+  width: min(640px, 100%);
+  margin: 0 auto;
+  padding: 44px 20px 88px;
+}
+
+.up-eyebrow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--anton);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 20px;
+}
+
+.up-line {
+  margin: 0 0 10px;
+  font-weight: 400;
+}
+
+.up-ohh {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(24px, 3.4vw, 40px);
+}
+
+.up-shout {
+  font-family: var(--anton);
+  font-size: clamp(34px, 5.6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.up-copy {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.up-form {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+/* ---------- photos, huge and first ---------- */
+.up-photos {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.up-drop {
+  width: 100%;
+  min-height: 240px;
+  border: 2px solid var(--ink);
+  background: transparent;
+  box-shadow: 8px 8px 0 var(--ink);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 28px 20px;
+  cursor: pointer;
+  font-family: var(--grot);
+  color: var(--ink);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.up-drop:hover,
+.up-drop:focus-visible {
+  background: var(--red);
+  color: var(--paper);
+}
+
+.up-drop-shout {
+  font-family: var(--anton);
+  font-size: clamp(28px, 6vw, 44px);
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.up-drop-sub {
+  font-size: 14px;
+}
+
+/* the real input stays off screen; the drop button does the work */
+.up-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.up-shots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  padding-top: 10px;
+}
+
+/* taped polaroid-ish cards, echoing the wall frames on the landing */
+.up-shot {
+  margin: 0;
+  position: relative;
+  width: 148px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--ink);
+  padding: 8px 8px 6px;
+}
+
+.up-shot:nth-child(odd) {
+  transform: rotate(-1.1deg);
+}
+
+.up-shot:nth-child(even) {
+  transform: rotate(0.9deg);
+}
+
+.up-tape {
+  position: absolute;
+  width: 64px;
+  height: 20px;
+  background: rgba(233, 228, 216, 0.72);
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-3deg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+}
+
+.up-shot-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.up-shot--uploading .up-shot-img {
+  animation: up-pulse 1.4s ease-in-out infinite;
+}
+
+.up-shot--error .up-shot-img {
+  opacity: 0.4;
+}
+
+@keyframes up-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+.up-shot-cap {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding-top: 6px;
+  font-size: 11px;
+}
+
+.up-shot-state {
+  color: var(--muted);
+}
+
+.up-shot-state--err {
+  color: var(--red);
+}
+
+.up-bin {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--grot);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.up-bin:hover {
+  color: var(--red);
+}
+
+/* ---------- the fields ---------- */
+.up-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.up-label {
+  font-family: var(--anton);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* mirrors the .join-input underline treatment without touching Join.css */
+.up-input {
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  background: transparent;
+  font-family: var(--grot);
+  font-size: 17px;
+  padding: 10px 2px;
+  outline: none;
+  color: var(--ink);
+}
+
+.up-input:focus {
+  border-bottom-color: var(--red);
+}
+
+.up-input::placeholder {
+  color: var(--muted-dark);
+}
+
+.up-area {
+  resize: vertical;
+  min-height: 96px;
+  line-height: 1.55;
+}
+
+.up-dims {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.up-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.up-chip {
+  border: 2px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--grot);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.up-chip--on {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.up-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.up-err {
+  margin: 0;
+  font-size: 13px;
+  color: var(--red);
+}
+
+.up-btn {
+  align-self: flex-start;
+}
+
+.up-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+/* ---------- guard and done states ---------- */
+.up-guard {
+  margin: 40px 0 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.up-link {
+  color: var(--red);
+  font-weight: 500;
+  border-bottom: 2px solid var(--red);
+  padding-bottom: 2px;
+}
+
+.up-link:hover {
+  background: var(--red);
+  color: var(--paper);
+}
+
+.up-done {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.up-done-actions {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+
+.up-done-actions .up-btn {
+  align-self: auto;
+}
+
+.up-alt {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--grot);
+  font-size: 14px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.up-alt:hover {
+  color: var(--red);
+}
+
+.up-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 40px;
+  border-top: 2px solid var(--ink);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .up-nav,
+  .up-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .up-main {
+    padding: 32px 16px 64px;
+  }
+
+  .up-drop {
+    min-height: 200px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .up-drop {
+    transition: none;
+  }
+
+  .up-shot--uploading .up-shot-img {
+    animation: none;
+    opacity: 0.55;
+  }
+}
