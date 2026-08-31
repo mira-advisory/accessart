@@ -73,6 +73,19 @@ Wall user (web and mobile): feed (following + discover), post view with thread, 
 
 Operator (web only, role-gated module): waitlist list, users list, artworks list, rentals list with custody states, manual hand-over override, reports queue.
 
+## Flow details adopted from the retailer teardown (research/11)
+
+- **Feed before everything**: the door page opens into real content with no account wall. "artists keep X%" is stated as a headline on the artist door, never buried in a help centre (Vinted does this; Bluethumb buries it).
+- **Upload is Depop-shaped**: photo first, live in under five minutes, no review queue ever (Artfinder's 3 to 4 week review and reapply bans are the anti-pattern). Identity checks happen once, at first payout, inside Stripe.
+- **Story via casual rotating prompts** ("what were you listening to when you made this?"), never CV or credential fields (Rise Art scores artists on 11 credential factors; we are not a gallery).
+- **Pricing helper**: as the artist types a value, the screen shows the derived weekly rent and "paid off in N weeks" live.
+- **Artwork page**: auto to-scale render of the piece on a wall from its dimensions (Saatchi's View in a Room drove 4x conversion), plus the one-line dual price: "$12/wk. every dollar counts toward the $480 buy."
+- **Saves do double duty**: a save also subscribes to price-drop and now-available notifications.
+- **"fresh walls"**: a weekly fixed-time drop of new pieces to create an appointment habit (StockX/Whatnot mechanics, art-shaped).
+- **My wall shows an ownership progress bar** per piece: rent paid filling toward the buy price.
+- **Issue handling stays human**: a 2-day photo-based issue window on delivery, plain words, and never a fee to get a refund (Saatchi charges 20% to process refunds; that is the corporate smell we exist against).
+- **Notification tone**: lowercase, specific, dry. "your rent just knocked another $12 off this piece."
+
 ## Explicitly out of v1
 
 Instagram portfolio import, AR wall preview, courier integration, venue anything, subscriptions, auctions, commissions/custom work, DMs (threads are public; hand-over coordination is the only private channel), algorithmic feed ranking, livestreams.
