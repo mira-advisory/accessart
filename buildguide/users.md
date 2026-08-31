@@ -49,14 +49,30 @@ What a wall user can do in v1: browse, follow artists, save pieces; rent (starts
 
 Rental record: `rental_id`, `artwork_id`, `renter_id`, `artist_id`, rate per 4-week block, block anchor date, status (`active | ending | ended | converted`), `credit_accrued_cents`, custody events with condition photo keys, timestamps.
 
+## The social layer (Ben, 2026-08-31: "borderline a social network")
+
+This is not a bolt-on. The product is a social network for artists whose commerce is rent/swap/buy. Instagram/TikTok mechanics, art-shaped.
+
+**Posts.** Artists post beyond listings: process videos and timelapses (the format that out-reaches finished work), WIP shots, studio life, and plain text notes (which is how artist-to-artist help happens: "how do you varnish resin?" is just a post). A post can tag an artwork; that tag is the commerce door (see the making-of, tap the piece, rent it). Post record: `post_id`, `artist_id`, `market_id`, type (`images | video | note`), media keys, text, optional `artwork_id`, timestamps. Video v1: short clips (60s cap), direct upload, no fancy transcoding yet.
+
+**Threads.** Every post carries a thread: comments with one level of replies. Open to everyone; artists helping artists and fans talking to artists use the same mechanic. Comment record: `comment_id`, `post_id`, `user_id`, optional `parent_id`, text, timestamps.
+
+**Follows and likes.** Anyone with an account follows artists; likes on posts, saves on artworks. Follower counts on artist pages. Records: `follows` (follower_id, artist_id), `likes` (user_id, post_id).
+
+**Feed.** Two tabs, v1 chronological: following (posts and new listings from artists you follow) and discover (market-wide). No ranking algorithm until there is enough content to rank.
+
+**Notifications in the brand voice.** "krista started following you." "your timelapse is doing numbers." "someone rented afternoon, interrupted."
+
+**Moderation, because threads mean UGC.** Report button on posts and comments; operator module gets a reports queue with hide/remove/ban. No pre-moderation.
+
 ## The v1 screen list
 
-Artist (mobile first): door page, signup, profile setup, compliance screen, upload flow, my pieces, piece detail, earnings, notifications.
+Artist (mobile first): door page, signup, profile setup, compliance screen, upload flow, post composer (photo/video/note, optional artwork tag), my pieces, piece detail, earnings, notifications.
 
-Wall user (web and mobile): feed, artwork page, artist page, rent flow (3 steps), my wall, swap flow, buy flow, account.
+Wall user (web and mobile): feed (following + discover), post view with thread, artwork page, artist page, rent flow (3 steps), my wall, swap flow, buy flow, account.
 
-Operator (web only, role-gated module): waitlist list, users list, artworks list, rentals list with custody states, manual hand-over override.
+Operator (web only, role-gated module): waitlist list, users list, artworks list, rentals list with custody states, manual hand-over override, reports queue.
 
 ## Explicitly out of v1
 
-Instagram portfolio import, AR wall preview, courier integration, venue anything, subscriptions, auctions, commissions/custom work, messaging beyond hand-over coordination.
+Instagram portfolio import, AR wall preview, courier integration, venue anything, subscriptions, auctions, commissions/custom work, DMs (threads are public; hand-over coordination is the only private channel), algorithmic feed ranking, livestreams.
