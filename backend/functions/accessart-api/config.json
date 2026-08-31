@@ -20,8 +20,8 @@
       "WAITLIST_TABLE": "aa_dev_waitlist",
       "USERS_TABLE": "aa_dev_users",
       "MARKETS_TABLE": "aa_dev_markets",
-      "COGNITO_POOL_ID": "",
-      "COGNITO_CLIENT_ID": "",
+      "COGNITO_POOL_ID": "ap-southeast-2_qqT91OpBb",
+      "COGNITO_CLIENT_ID": "4p55lnrh3f783bp9ohse3hir89",
       "FROM_EMAIL": "accessart <hello@accessart.net>",
       "NOTIFY_EMAIL": "ben.john.dawes@gmail.com"
     }
