@@ -1,7 +1,14 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { confirmSignIn, signIn, signUp } from 'aws-amplify/auth'
+import {
+  autoSignIn,
+  confirmSignIn,
+  confirmSignUp,
+  resendSignUpCode,
+  signIn,
+  signUp,
+} from 'aws-amplify/auth'
 import { api, ApiError } from '../api/client'
 import { authConfigured } from '../auth'
 import './Join.css'
@@ -42,6 +49,8 @@ function Join() {
   const door = params.get('door') === 'art' ? 'art' : 'walls'
 
   const [step, setStep] = useState<Step>('email')
+  // signup: confirming a brand-new account's code. signin: answering a sign-in challenge.
+  const [mode, setMode] = useState<'signup' | 'signin'>('signin')
   const [email, setEmail] = useState('')
   const [code, setCode] = useState('')
   const [handle, setHandle] = useState('')
@@ -80,31 +89,52 @@ function Join() {
     setBusy(true)
     setErr('')
     try {
+      // New users: passwordless SignUp itself emails a confirmation code.
+      let isNew = false
       try {
-        await signUp({
+        const su = await signUp({
           username: addr,
-          options: { userAttributes: { email: addr } },
+          options: { userAttributes: { email: addr }, autoSignIn: true },
           passwordless: true,
         } as never)
+        const suStep = (su as { nextStep?: { signUpStep?: string } }).nextStep?.signUpStep
+        isNew = suStep === 'CONFIRM_SIGN_UP'
       } catch (suError) {
         const suName = suError instanceof Error ? suError.name : ''
-        const suText = suError instanceof Error ? suError.message : ''
-        const fine =
-          suName === 'UsernameExistsException' ||
-          /passwordless|not.{0,10}supported|InvalidParameter/i.test(`${suName} ${suText}`)
-        if (!fine) throw suError
+        if (suName !== 'UsernameExistsException') throw suError
       }
-      const { nextStep } = await signIn({
-        username: addr,
-        options: { authFlowType: 'USER_AUTH', preferredChallenge: 'EMAIL_OTP' },
-      })
-      if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_EMAIL_CODE') {
+      if (isNew) {
+        setMode('signup')
         setCode('')
         setStep('code')
-      } else if (nextStep.signInStep === 'DONE') {
-        await enterProfile()
-      } else {
-        setErr('sign-in came back with a step we don’t handle yet.')
+        return
+      }
+      // Existing users: passwordless sign-in challenge.
+      try {
+        const { nextStep } = await signIn({
+          username: addr,
+          options: { authFlowType: 'USER_AUTH', preferredChallenge: 'EMAIL_OTP' },
+        })
+        if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_EMAIL_CODE') {
+          setMode('signin')
+          setCode('')
+          setStep('code')
+        } else if (nextStep.signInStep === 'DONE') {
+          await enterProfile()
+        } else {
+          setErr('sign-in came back with a step we don’t handle yet.')
+        }
+      } catch (siError) {
+        const siName = siError instanceof Error ? siError.name : ''
+        if (siName === 'UserNotConfirmedException') {
+          // A half-finished signup from before: send a fresh confirmation code.
+          await resendSignUpCode({ username: addr })
+          setMode('signup')
+          setCode('')
+          setStep('code')
+        } else {
+          throw siError
+        }
       }
     } catch (error) {
       if (error instanceof Error && error.name === 'UserAlreadyAuthenticatedException') {
@@ -123,11 +153,37 @@ function Join() {
     setBusy(true)
     setErr('')
     try {
-      const { nextStep } = await confirmSignIn({ challengeResponse: code })
-      if (nextStep.signInStep === 'DONE') {
+      if (mode === 'signup') {
+        const addr = email.trim().toLowerCase()
+        await confirmSignUp({ username: addr, confirmationCode: code })
+        try {
+          const r = await autoSignIn()
+          if (r.nextStep.signInStep !== 'DONE') throw new Error('auto sign-in incomplete')
+        } catch {
+          // No auto session available: fall back to a sign-in challenge.
+          const { nextStep } = await signIn({
+            username: addr,
+            options: { authFlowType: 'USER_AUTH', preferredChallenge: 'EMAIL_OTP' },
+          })
+          if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_EMAIL_CODE') {
+            setMode('signin')
+            setCode('')
+            setErr('one more code just landed. use the newest one.')
+            return
+          }
+          if (nextStep.signInStep !== 'DONE') {
+            setErr('that didn’t land. start over.')
+            return
+          }
+        }
         await enterProfile()
       } else {
-        setErr('that code didn’t land. try again.')
+        const { nextStep } = await confirmSignIn({ challengeResponse: code })
+        if (nextStep.signInStep === 'DONE') {
+          await enterProfile()
+        } else {
+          setErr('that code didn’t land. try again.')
+        }
       }
     } catch (error) {
       setErr(dryAuthError(error, 'that code didn’t work. try again.'))
