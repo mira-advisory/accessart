@@ -94,7 +94,7 @@ function Join() {
       try {
         const su = await signUp({
           username: addr,
-          options: { userAttributes: { email: addr }, autoSignIn: true },
+          options: { userAttributes: { email: addr }, autoSignIn: { authFlowType: 'USER_AUTH' } },
           passwordless: true,
         } as never)
         const suStep = (su as { nextStep?: { signUpStep?: string } }).nextStep?.signUpStep
@@ -147,9 +147,12 @@ function Join() {
     }
   }
 
+  // signup confirmation codes are six digits; sign-in challenge codes are eight.
+  const codeLen = mode === 'signup' ? 6 : 8
+
   const submitCode = async (e: FormEvent) => {
     e.preventDefault()
-    if (busy || code.length !== 6) return
+    if (busy || code.length !== codeLen) return
     setBusy(true)
     setErr('')
     try {
@@ -278,18 +281,24 @@ function Join() {
               <h1 className="join-line">
                 <span className="join-shout">check your email.</span>
               </h1>
-              <p className="join-copy">six digits, sent to {email.trim().toLowerCase()}.</p>
+              <p className="join-copy">
+                {codeLen === 6 ? 'six' : 'eight'} digits, sent to {email.trim().toLowerCase()}.
+              </p>
               <form className="join-form" onSubmit={submitCode}>
                 <input
                   className="join-input join-code"
                   inputMode="numeric"
                   autoComplete="one-time-code"
-                  placeholder="000000"
+                  placeholder={'0'.repeat(codeLen)}
                   value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, codeLen))}
                   autoFocus
                 />
-                <button className="btn join-btn" type="submit" disabled={busy || code.length !== 6}>
+                <button
+                  className="btn join-btn"
+                  type="submit"
+                  disabled={busy || code.length !== codeLen}
+                >
                   {busy ? 'hold on.' : 'in.'}
                 </button>
                 <button
