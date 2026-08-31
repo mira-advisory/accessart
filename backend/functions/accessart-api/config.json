@@ -8,12 +8,20 @@
     "prod": {
       "STAGE": "prod",
       "WAITLIST_TABLE": "aa_waitlist",
+      "USERS_TABLE": "aa_users",
+      "MARKETS_TABLE": "aa_markets",
+      "COGNITO_POOL_ID": "ap-southeast-2_sYWMgqIhl",
+      "COGNITO_CLIENT_ID": "1fimgdjao2ubmne4s4rip1kvsb",
       "FROM_EMAIL": "accessart <hello@accessart.net>",
       "NOTIFY_EMAIL": "ben.john.dawes@gmail.com"
     },
     "staging": {
       "STAGE": "staging",
       "WAITLIST_TABLE": "aa_staging_waitlist",
+      "USERS_TABLE": "aa_staging_users",
+      "MARKETS_TABLE": "aa_markets",
+      "COGNITO_POOL_ID": "ap-southeast-2_sYWMgqIhl",
+      "COGNITO_CLIENT_ID": "1fimgdjao2ubmne4s4rip1kvsb",
       "FROM_EMAIL": "accessart <hello@accessart.net>",
       "NOTIFY_EMAIL": "ben.john.dawes@gmail.com"
     }

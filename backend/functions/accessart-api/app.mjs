@@ -5,6 +5,7 @@ import { jsonResponse, getMethod, getPath, parseBody } from "./shared/http.mjs";
 import { resolveIdentity } from "./shared/identity.mjs";
 import * as health from "./routes/health.mjs";
 import * as waitlist from "./routes/waitlist.mjs";
+import * as me from "./routes/me.mjs";
 
 export async function handleHttp(event) {
   const method = getMethod(event);
@@ -33,7 +34,9 @@ export async function handleHttp(event) {
   ctx.user = identity;
 
   // ---------- authed routes ----------
-  // (added as they're built: /me, /uploads/presign, /artworks, /feed, ...)
+  if (method === "GET" && path === "/me") return me.get(ctx);
+  if (method === "PATCH" && path === "/me") return me.patch(ctx);
+  // (added as they're built: /uploads/presign, /artworks, /feed, ...)
 
   return jsonResponse(404, { ok: false, error: "NOT_FOUND", message: `No route for ${method} ${path}` });
 }

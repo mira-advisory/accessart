@@ -1,0 +1,235 @@
+/* ================= join flow (/join) ================= */
+/* local classes only. shared tokens and .btn live in index.css / App.css. */
+
+.join {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.join-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.join-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.join-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 72px 20px;
+}
+
+.join-card {
+  width: min(560px, 100%);
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 10px 10px 0 var(--ink);
+  transform: rotate(-0.4deg);
+  padding: 36px 40px 44px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.join-eyebrow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--anton);
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.join-line {
+  margin: 0;
+  font-weight: 400;
+}
+
+.join-ohh {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(24px, 3.4vw, 40px);
+}
+
+.join-shout {
+  font-family: var(--anton);
+  font-size: clamp(34px, 5.6vw, 56px);
+  line-height: 1.02;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.join-copy {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--muted);
+}
+
+.join-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.join-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.join-label {
+  font-family: var(--anton);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* mirrors the .fa-input underline treatment without touching App.css */
+.join-input {
+  border: none;
+  border-bottom: 2px solid var(--ink);
+  background: transparent;
+  font-family: var(--grot);
+  font-size: 17px;
+  padding: 10px 2px;
+  outline: none;
+  color: var(--ink);
+}
+
+.join-input:focus {
+  border-bottom-color: var(--red);
+}
+
+.join-input::placeholder {
+  color: var(--muted-dark);
+}
+
+.join-code {
+  font-size: 32px;
+  letter-spacing: 0.42em;
+  max-width: 320px;
+}
+
+.join-chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.join-chip {
+  border: 2px solid var(--ink);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--grot);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.join-chip--on {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.join-btn {
+  align-self: flex-start;
+}
+
+.join-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.join-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.join-err {
+  margin: 0;
+  font-size: 13px;
+  color: var(--red);
+}
+
+.join-alt {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: var(--grot);
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.join-alt:hover {
+  color: var(--red);
+}
+
+.join-next {
+  margin: 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.join-back {
+  align-self: flex-start;
+  color: var(--red);
+  font-weight: 500;
+  border-bottom: 2px solid var(--red);
+  padding-bottom: 2px;
+}
+
+.join-back:hover {
+  background: var(--red);
+  color: var(--paper);
+}
+
+.join-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 40px;
+  border-top: 2px solid var(--ink);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .join-nav,
+  .join-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .join-main {
+    padding: 40px 16px;
+  }
+
+  .join-card {
+    padding: 28px 22px 34px;
+    box-shadow: 7px 7px 0 var(--ink);
+  }
+}

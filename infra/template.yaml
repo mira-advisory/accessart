@@ -25,6 +25,10 @@ Resources:
         Variables:
           STAGE: prod
           WAITLIST_TABLE: !Ref AaWaitlistTable
+          USERS_TABLE: !Ref AaUsersTable
+          MARKETS_TABLE: !Ref AaMarketsTable
+          COGNITO_POOL_ID: !Ref AaUserPool
+          COGNITO_CLIENT_ID: !Ref AaUserPoolClient
           FROM_EMAIL: accessart <hello@accessart.net>
           NOTIFY_EMAIL: ben.john.dawes@gmail.com
       Policies:
@@ -32,6 +36,12 @@ Resources:
             TableName: !Ref AaWaitlistTable
         - DynamoDBCrudPolicy:
             TableName: !Ref AaStagingWaitlistTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AaUsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AaStagingUsersTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AaMarketsTable
         - Statement:
             - Effect: Allow
               Action:
@@ -88,6 +98,109 @@ Resources:
           AttributeType: S
       KeySchema:
         - AttributeName: email
+          KeyType: HASH
+
+  AaUserPool:
+    Type: AWS::Cognito::UserPool
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      UserPoolName: aa-users
+      UserPoolTier: ESSENTIALS
+      DeletionProtection: ACTIVE
+      UsernameAttributes:
+        - email
+      AutoVerifiedAttributes:
+        - email
+      Policies:
+        SignInPolicy:
+          AllowedFirstAuthFactors:
+            - PASSWORD
+            - EMAIL_OTP
+      EmailConfiguration:
+        EmailSendingAccount: DEVELOPER
+        From: accessart <hello@accessart.net>
+        SourceArn: !Sub "arn:aws:ses:${AWS::Region}:${AWS::AccountId}:identity/accessart.net"
+      Schema:
+        - Name: email
+          AttributeDataType: String
+          Required: true
+          Mutable: true
+
+  AaUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: aa-web
+      UserPoolId: !Ref AaUserPool
+      GenerateSecret: false
+      PreventUserExistenceErrors: ENABLED
+      ExplicitAuthFlows:
+        - ALLOW_USER_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+      AccessTokenValidity: 1
+      IdTokenValidity: 1
+      RefreshTokenValidity: 30
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
+
+  AaUsersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: aa_users
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: handle
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: HandleIndex
+          KeySchema:
+            - AttributeName: handle
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  AaStagingUsersTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: aa_staging_users
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: user_id
+          AttributeType: S
+        - AttributeName: handle
+          AttributeType: S
+      KeySchema:
+        - AttributeName: user_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: HandleIndex
+          KeySchema:
+            - AttributeName: handle
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+
+  AaMarketsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: aa_markets
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: market_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: market_id
           KeyType: HASH
 
   AaApiCertificate:
@@ -231,3 +344,9 @@ Outputs:
   RawApiUrl:
     Description: Raw execute-api URL (works before/without the custom domain)
     Value: !Sub "https://${AaHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  UserPoolId:
+    Description: Cognito user pool id (VITE_COGNITO_POOL_ID)
+    Value: !Ref AaUserPool
+  UserPoolClientId:
+    Description: Cognito app client id (VITE_COGNITO_CLIENT_ID)
+    Value: !Ref AaUserPoolClient

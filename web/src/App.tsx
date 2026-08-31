@@ -151,7 +151,7 @@ function App() {
       </header>
 
       <main className="split">
-        <a className="half half--art" href="#art">
+        <a className="half half--art" href="/join?door=art">
           <span className="half-line">
             <span className="half-ohh">ooohhh, i have</span>
             <span className="half-word">art.</span>
@@ -163,7 +163,7 @@ function App() {
           </span>
         </a>
 
-        <a className="half half--walls" href="#walls">
+        <a className="half half--walls" href="/join?door=walls">
           <span className="half-line">
             <span className="half-word">walls.</span>
           </span>
