@@ -11,6 +11,7 @@ import {
 } from 'aws-amplify/auth'
 import { api, ApiError } from '../api/client'
 import { authConfigured } from '../auth'
+import { goToSpace } from '../lib/host'
 import './Join.css'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -214,12 +215,13 @@ function Join() {
       const roles = [...(hasArt ? ['artist'] : []), ...(hasWalls ? ['buyer'] : [])]
       const trimmedName = name.trim()
       await api.patchMe({ handle: h, ...(trimmedName ? { name: trimmedName } : {}), roles })
-      // Artists go straight to work; walls users get the done screen until the feed exists.
+      // Artists go straight to work; everyone else lands in their space.
       if (hasArt) {
         navigate('/upload')
         return
       }
-      setStep('done')
+      goToSpace(navigate)
+      return
     } catch (error) {
       if (error instanceof ApiError && error.code === 'HANDLE_TAKEN') {
         setErr('that handle’s taken.')

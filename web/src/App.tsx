@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FormEvent } from 'react'
+import { fetchAuthSession } from 'aws-amplify/auth'
+import { authConfigured } from './auth'
+import { spaceHref } from './lib/host'
 import './App.css'
 
 function Triangle({ size = 18, fill = 'currentColor' }: { size?: number; fill?: string }) {
@@ -138,6 +141,14 @@ function FirstAccess({ open, setOpen }: { open: boolean; setOpen: (v: boolean) =
 
 function App() {
   const [faOpen, setFaOpen] = useState(false)
+  const [signedIn, setSignedIn] = useState(false)
+
+  useEffect(() => {
+    if (!authConfigured) return
+    fetchAuthSession()
+      .then((s) => setSignedIn(!!s.tokens?.idToken))
+      .catch(() => setSignedIn(false))
+  }, [])
 
   return (
     <div className={`landing${faOpen ? ' landing--fa' : ''}`}>
@@ -148,7 +159,11 @@ function App() {
           <Triangle size={20} />
           <span>art</span>
         </a>
-        <a className="btn" href="/join">access</a>
+        {signedIn ? (
+          <a className="btn" href={spaceHref()}>your space</a>
+        ) : (
+          <a className="btn" href="/join">access</a>
+        )}
       </header>
 
       <main className="split">
