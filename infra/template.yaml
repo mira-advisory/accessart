@@ -41,6 +41,8 @@ Resources:
           MARKETS_TABLE: !Ref AaMarketsTable
           COGNITO_POOL_ID: !Ref AaUserPool
           COGNITO_CLIENT_ID: !Ref AaUserPoolClient
+          MEDIA_BUCKET: !Ref AaMediaBucket
+          ARTWORKS_TABLE: !Ref AaArtworksTable
           FROM_EMAIL: accessart <hello@accessart.net>
           NOTIFY_EMAIL: ben.john.dawes@gmail.com
       Policies:
@@ -50,6 +52,10 @@ Resources:
             TableName: !Ref AaUsersTable
         - DynamoDBCrudPolicy:
             TableName: !Ref AaMarketsTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref AaArtworksTable
+        - S3CrudPolicy:
+            BucketName: !Ref AaMediaBucket
         - Statement:
             - Effect: Allow
               Action:
@@ -129,6 +135,76 @@ Resources:
       KeySchema:
         - AttributeName: market_id
           KeyType: HASH
+
+  AaMediaBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: !If [IsProd, aa-media-400792111355, aa-media-dev-400792111355]
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: false
+        RestrictPublicBuckets: false
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods:
+              - GET
+              - PUT
+              - HEAD
+            AllowedOrigins:
+              - "*"
+            AllowedHeaders:
+              - "*"
+            MaxAge: 3600
+
+  AaMediaBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref AaMediaBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${AaMediaBucket.Arn}/artworks/*"
+
+  AaArtworksTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    Properties:
+      TableName: !If [IsProd, aa_artworks, aa_dev_artworks]
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: artwork_id
+          AttributeType: S
+        - AttributeName: artist_id
+          AttributeType: S
+        - AttributeName: market_id
+          AttributeType: S
+        - AttributeName: created_at
+          AttributeType: S
+      KeySchema:
+        - AttributeName: artwork_id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: ArtistIndex
+          KeySchema:
+            - AttributeName: artist_id
+              KeyType: HASH
+            - AttributeName: created_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+        - IndexName: MarketIndex
+          KeySchema:
+            - AttributeName: market_id
+              KeyType: HASH
+            - AttributeName: created_at
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
 
   AaUserPool:
     Type: AWS::Cognito::UserPool

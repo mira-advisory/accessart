@@ -1,0 +1,190 @@
+/* ================= public artist page (/@handle) ================= */
+/* local classes only. shared tokens and .btn live in index.css / App.css. */
+
+.ar {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.ar-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px;
+  border-bottom: 2px solid var(--ink);
+}
+
+.ar-brand {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-weight: 700;
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.ar-main {
+  flex: 1;
+  width: min(1080px, 100%);
+  margin: 0 auto;
+  padding: 56px 24px 96px;
+}
+
+.ar-line {
+  margin: 0;
+  font-weight: 400;
+}
+
+.ar-ohh {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: clamp(26px, 4vw, 48px);
+}
+
+.ar-shout {
+  font-family: var(--anton);
+  font-size: clamp(44px, 9vw, 110px);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  overflow-wrap: anywhere;
+}
+
+.ar-name {
+  margin: 12px 0 0;
+  font-size: 16px;
+  color: var(--muted);
+}
+
+/* the wall: commerce cards identical everywhere (house rule 5) */
+.ar-grid {
+  margin-top: 52px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 30px;
+}
+
+.ar-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 7px 7px 0 var(--ink);
+  padding: 12px 12px 14px;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.ar-card:hover,
+.ar-card:focus-visible {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.ar-card-img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.ar-card-blank {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  background: var(--paper-dim);
+  margin-bottom: 10px;
+}
+
+.ar-card-title {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 22px;
+  line-height: 1.15;
+}
+
+.ar-card-dims {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.ar-card:hover .ar-card-dims,
+.ar-card:focus-visible .ar-card-dims {
+  color: var(--muted-dark);
+}
+
+.ar-card-price {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ar-empty {
+  margin: 52px 0 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.ar-guard {
+  margin: 40px 0 0;
+  font-size: 15px;
+  color: var(--muted);
+}
+
+.ar-gone {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.ar-back {
+  color: var(--red);
+  font-weight: 500;
+  border-bottom: 2px solid var(--red);
+  padding-bottom: 2px;
+}
+
+.ar-back:hover {
+  background: var(--red);
+  color: var(--paper);
+}
+
+.ar-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 40px;
+  border-top: 2px solid var(--ink);
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@media (max-width: 560px) {
+  .ar-nav,
+  .ar-foot {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .ar-main {
+    padding: 36px 16px 64px;
+  }
+
+  .ar-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 20px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ar-card {
+    transition: none;
+  }
+}

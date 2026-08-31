@@ -389,9 +389,13 @@ function Join() {
                 <span className="join-ohh">ohhh yeh.</span>{' '}
                 <span className="join-shout">you’re in.</span>
               </h1>
-              <p className="join-next">
-                {hasArt ? 'next: your first upload. soon.' : 'next: the feed. soon.'}
-              </p>
+              {hasArt ? (
+                <Link className="btn join-btn" to="/upload">
+                  go upload.
+                </Link>
+              ) : (
+                <p className="join-next">next: the feed. soon.</p>
+              )}
               <Link className="join-back" to="/">
                 back to the front.
               </Link>
